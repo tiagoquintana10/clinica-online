@@ -71,5 +71,20 @@ export class HomeComponent implements OnInit{
     return url === '/home';
   }
 
+  esAdmin(): boolean {
+    return this.usuario?.categoria === 'administrador';
+  }
+
+  esEspecialista(): boolean {
+    return this.usuario?.categoria === 'especialista';
+  }
+
+  esPaciente(): boolean {
+    return this.usuario?.categoria === 'paciente';
+  }
+
+  cuentaHabilitada(): boolean{
+    return this.usuario?.habilitado === true;
+  }
   
 }
