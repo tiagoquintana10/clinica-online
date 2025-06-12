@@ -1,21 +1,30 @@
-<nav class="navbar">
-  <div class="navbar-container">
-    <span class="logo">Clínica Online</span>
-    <ul class="nav-links">
-      <li *ngIf="usuario?.categoria === 'administrador'"><a [routerLink]="['usuarios']">Gestión De Usuarios</a></li>
-      <li *ngIf="usuario?.categoria === 'administrador'"><a [routerLink]="['generar-usuario']">Generar Usuario</a></li>
-      <li *ngIf="usuario?.categoria === 'especialista'"><a [routerLink]="['turnos']">Mis Turnos</a></li>
-      <li *ngIf="usuario?.categoria === 'paciente'"><a [routerLink]="['pedir-turno']">Pedir Turno</a></li>
-      <li><a (click)="logout()">Cerrar sesión</a></li>
-    </ul>
-  </div>
-</nav>
+<div *ngIf="cuentaHabilitada()">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <span class="logo">Clínica Online</span>
+      <ul class="nav-links">
+        <li *ngIf="esAdmin()"><a [routerLink]="['usuarios']">Gestión De Usuarios</a></li>
+        <li *ngIf="esAdmin()"><a [routerLink]="['generar-usuario']">Generar Usuario</a></li>
+        <li *ngIf="esEspecialista()"><a [routerLink]="['turnos']">Mis Turnos</a></li>
+        <li *ngIf="esPaciente()"><a [routerLink]="['pedir-turno']">Pedir Turno</a></li>
+        <li><a (click)="logout()">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </nav>
 
-<div *ngIf="mostrarDatos()" class="home-container">
-  <div class="bienvenida">
-    <h2>Bienvenido{{ usuario?.nombre && usuario?.apellido ? ', ' + usuario?.nombre + ' ' + usuario?.apellido : '' }}!</h2>
-    <p>Estás logueado como: <strong>{{ usuario?.categoria }}</strong></p>
-    <p>Usá el menú superior para navegar por la aplicación.</p>
+  <div *ngIf="mostrarDatos()" class="home-container">
+    <div class="bienvenida">
+      <h2>Bienvenido{{ usuario?.nombre && usuario?.apellido ? ', ' + usuario?.nombre + ' ' + usuario?.apellido : '' }}!</h2>
+      <p>Estás logueado como: <strong>{{ usuario?.categoria }}</strong></p>
+      <p>Usá el menú superior para navegar por la aplicación.</p>
+    </div>
   </div>
 </div>
+<div *ngIf="!cuentaHabilitada()" class="no-habilitada">
+  <h2>Cuenta no habilitada</h2>
+    <p>Tu cuenta aún no ha sido aprobada por un administrador.</p>
+    <p>Por favor, intentá más tarde o comunicate con soporte.</p>
+</div>
+
+
 <router-outlet></router-outlet>
