@@ -1,1 +1,38 @@
-<p>usuarios works!</p>
+<div class="usuarios-container">
+  <h2>Usuarios Registrados</h2>
+
+  <table *ngIf="usuarios.length > 0">
+    <thead>
+      <tr>
+        <th>Nombre Completo</th>
+        <th>Edad</th>
+        <th>DNI</th>
+        <th>Email</th>
+        <th>Categoría</th>
+        <th>Habilitado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let usuario of usuarios">
+        <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+        <td>{{ usuario.edad }}</td>
+        <td>{{ usuario.dni }}</td>
+        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.categoria }}</td>
+        <td>
+          <button *ngIf="usuario.categoria === 'especialista' || usuario.categoria === 'administrador'" 
+                  (click)="actualizarEstado(usuario)">
+            {{ usuario.habilitado ? 'Deshabilitar' : 'Habilitar' }}
+          </button>
+          <span *ngIf="usuario.categoria !== 'especialista' && usuario.categoria !== 'administrador'">
+            {{ usuario.habilitado ? 'Sí' : 'No' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="usuarios.length === 0" class="no-users-message">
+    No hay usuarios registrados para mostrar.
+  </div>
+</div>
