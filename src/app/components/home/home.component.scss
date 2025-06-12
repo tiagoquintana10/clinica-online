@@ -59,3 +59,24 @@
     }
   }
 }
+.no-habilitada {
+  background-color: white;
+  max-width: 700px;
+  padding: 60px 70px;
+  border-radius: 12px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #2c3e50;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+}
+
+
+
+
