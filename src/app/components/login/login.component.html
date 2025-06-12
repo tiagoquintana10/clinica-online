@@ -1,0 +1,45 @@
+<div class="login-container">
+  <h2>Iniciar Sesión</h2>
+
+  <form (ngSubmit)="login()" #form="ngForm" autocomplete="off">
+
+    <div class="form-row" style="position: relative;">
+      <label>Email:</label>
+
+      <input
+        type="email"
+        [(ngModel)]="mail"
+        name="mail"
+        required
+        (input)="inputEmail()"
+        (blur)="esconderSuggestions()"
+        autocomplete="off" />
+
+
+      <ul *ngIf="showSuggestions && filteredEmails.length > 0" class="suggestions-list">
+        <li *ngFor="let email of filteredEmails" (mousedown)="selectEmail(email)">
+          {{ email }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="form-row">
+      <label>Contraseña:</label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+        autocomplete="current-password" />
+    </div>
+
+    <div class="form-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+    <button type="submit">Iniciar Sesión</button>
+  </form>
+
+  <div class="login-link-container">
+    <span>¿No tenés cuenta? </span>
+    <a routerLink="/register" class="login-link">Registrate</a>
+  </div>
+</div>
