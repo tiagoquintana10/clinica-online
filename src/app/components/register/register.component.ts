@@ -133,7 +133,7 @@ export class RegisterComponent {
       if (error) {
         console.error('Error:', error.message);
       } else {
-        this.router.navigate(['home']);
+        this.router.navigate(['login']);
       }
     });
   }  
