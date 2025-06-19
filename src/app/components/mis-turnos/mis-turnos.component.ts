@@ -19,7 +19,7 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 export class MisTurnosComponent implements OnInit {
 
   usuario: Usuario | null = null;
-  turnos: Turno[] = [];
+  turnos: any[] = [];
 
 
     
@@ -68,11 +68,10 @@ export class MisTurnosComponent implements OnInit {
           this.turnos = [];
           return;
         }
-
-        this.turnos = (data || []).map(t => ({
+        this.turnos = (data as any[]).map(t => ({
           ...t,
-          paciente_nombre: t.paciente ? `${t.paciente.nombre} ${t.paciente.apellido}` : 'Paciente',
-          especialista_nombre: t.especialista ? `${t.especialista.nombre} ${t.especialista.apellido}` : 'Especialista'
+          paciente: t.paciente || { nombre: 'Paciente', apellido: '' },
+          especialista: t.especialista || { nombre: 'Especialista', apellido: '' },
         }));
       });
   }
