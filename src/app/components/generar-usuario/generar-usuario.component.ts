@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment.prod';
 import { createClient } from '@supabase/supabase-js';
 import { Usuario } from '../../models/usuario';
@@ -13,7 +13,7 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   templateUrl: './generar-usuario.component.html',
   styleUrl: './generar-usuario.component.scss'
 })
-export class GenerarUsuarioComponent {
+export class GenerarUsuarioComponent implements OnInit{
 
     
   usuario: Usuario = {
@@ -30,7 +30,7 @@ export class GenerarUsuarioComponent {
       email:''
   };
 
-  especialidadesDisponibles: string[] = ['Alergia','Pediatria','Cardiologia','Traumatologia','Psiquiatria'];
+  especialidadesDisponibles: { id: string; nombre: string }[] = [];
   
   password: string = '';
   avatarFile: File | null = null;
@@ -45,6 +45,10 @@ export class GenerarUsuarioComponent {
 
   constructor(private router: Router) {}
 
+  ngOnInit(): void {
+    this.loadEspecialidades();
+  }
+
   registrar() {
     this.submitted = true;
     this.errorMsg = '';
@@ -58,12 +62,44 @@ export class GenerarUsuarioComponent {
       return;
     }
 
-    // para especialistas
-    if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !this.avatarFile || !u.obra_social)) {
-      this.errorMsg = 'Por favor completá todos los campos obligatorios.';
+    //para especialistas y agregar especialidad
+    if (this.especialidadSeleccionada === 'Otro' && this.nuevaEspecialidad.trim() !== '') {
+      supabase
+        .from('especialidades')
+        .insert([{ nombre: this.nuevaEspecialidad.trim(), habilitado: true }])
+        .select('id')
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error agregando nueva especialidad:', error.message);
+            this.errorMsg = 'No se pudo agregar la nueva especialidad. Intente más tarde.';
+            return;
+          }
+          u.especialidades = [data.id];
+          // hay q validar una vez q ya se agrego la especialidad
+          if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !this.avatarFile || !u.obra_social)) {
+            this.errorMsg = 'Por favor completá todos los campos obligatorios.';
+            return;
+          }
+          this.continuarRegistro(u);
+        });
+    } else {
+    // si seleccionó una existente
+    if (this.especialidadSeleccionada !== 'Otro' && this.especialidadSeleccionada !== '') {
+      u.especialidades = [this.especialidadSeleccionada];
+    }
+
+    // si hay al menos una seleccionada
+    if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !u.obra_social)) {
+      this.errorMsg = 'Debés seleccionar al menos una especialidad.';
       return;
     }
 
+    this.continuarRegistro(u);
+    }
+  }
+
+  continuarRegistro(u: Usuario) {
     supabase.auth.signUp({
       email: u.email,
       password: this.password,
@@ -72,10 +108,8 @@ export class GenerarUsuarioComponent {
         console.error(error.message);
         this.errorMsg = 'Error al registrarse: ' + error.message;
       } else {
-        console.log('usuario registrado con exito', data.user);
-        
+        console.log('usuario registrado con éxito', data.user);
         this.saveUserData(data.user);
-
       }
     });
   }
@@ -190,5 +224,21 @@ export class GenerarUsuarioComponent {
       this.usuario.especialidades = [];
     }
   }
+
+  loadEspecialidades() {
+    supabase
+      .from('especialidades')
+      .select('id, nombre')
+      .eq('habilitado', true)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error cargando especialidades:', error.message);
+          return;
+        }
+        this.especialidadesDisponibles = data || [];
+      });
+  }
 }
+
+
 
