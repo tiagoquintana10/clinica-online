@@ -1,0 +1,65 @@
+<div class="turnos-container">
+  <h2>Turnos de la clínica</h2>
+
+  <!-- Filtros -->
+  <div>
+    <label>Especialidad:</label>
+    <input
+        list="especialidades"
+        [(ngModel)]="filtroEspecialidad"
+        (change)="onFiltroEspecialidadChange(filtroEspecialidad)"
+    />
+    <datalist id="especialidades">
+        
+        <option *ngFor="let esp of especialidades" [value]="esp"></option>
+    </datalist>
+
+    <label>Especialista:</label>
+    <input
+        list="especialistas"
+        [(ngModel)]="filtroEspecialistaNombre"
+        (change)="onFiltroEspecialistaChange(filtroEspecialistaNombre)"
+    />
+    <datalist id="especialistas">
+        
+        <option
+        *ngFor="let esp of especialistas"
+        [value]="esp.nombre + ' ' + esp.apellido"
+        ></option>
+    </datalist>
+  </div>
+
+  <!-- Listado de turnos -->
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Especialidad</th>
+        <th>Paciente</th>
+        <th>Especialista</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of turnos">
+        <td>{{ t.fecha | date: 'shortDate' }}</td>
+        <td>{{ t.fecha | date: 'shortTime' }}</td>
+        <td>{{ t.especialidad }}</td>
+        <td>{{ t.paciente_nombre }}</td>
+        <td>{{ t.especialista_nombre }}</td>
+
+
+
+        <td>{{ t.estado }}</td>
+        <td>
+            <div *ngIf="t.estado !== 'aceptado' && t.estado !== 'realizado' && t.estado !== 'rechazado' && t.estado !== 'cancelado'">
+            <input type="text" placeholder="Comentario" [(ngModel)]="comentariosAdmin[t.id]" />
+            <button (click)="cancelarTurno(t.id, comentariosAdmin[t.id])">Cancelar</button>
+            </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
