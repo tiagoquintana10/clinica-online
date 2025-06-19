@@ -50,7 +50,7 @@
         <label>Especialidades:</label>
         <select [(ngModel)]="especialidadSeleccionada" name="especialidades" (change)="EspecialidadChange()">
             <option value="" disabled selected>Elija una especialidad</option>
-            <option *ngFor="let esp of especialidadesDisponibles" [value]="esp">{{ esp }}</option>
+            <option *ngFor="let esp of especialidadesDisponibles" [value]="esp.id">{{ esp.nombre }}</option>
             <option value="Otro">Otro</option>
         </select>
 
@@ -61,7 +61,6 @@
             [(ngModel)]="nuevaEspecialidad"
             name="nuevaEspecialidad"
           />
-          <button type="button" (click)="agregarEspecialidad()">Agregar</button>
         </div>
     </div>
     
