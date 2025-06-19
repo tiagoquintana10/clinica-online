@@ -6,6 +6,11 @@ import { LoginComponent } from './components/login/login.component';
 import { BienvenidaComponent } from './components/bienvenida/bienvenida.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { GenerarUsuarioComponent } from './components/generar-usuario/generar-usuario.component';
+import { PerfilComponent } from './components/perfil/perfil.component';
+import { Component } from '@angular/core';
+import { DisponibilidadComponent } from './components/disponibilidad/disponibilidad.component';
+import { SolicitarTurnoComponent } from './components/solicitar-turno/solicitar-turno.component';
+import { TurnosComponent } from './components/turnos/turnos.component';
 
 export const routes: Routes = [
 
@@ -28,7 +33,24 @@ export const routes: Routes = [
             {
                 path: 'generar-usuario',
                 component: GenerarUsuarioComponent,
-            },            
+            },
+            {
+                path: 'perfil',
+                component: PerfilComponent,
+            },                
+            {
+                path: 'perfil/disponibilidad',
+                component: DisponibilidadComponent
+            },
+            {
+                path: 'solicitar-turno',
+                component: SolicitarTurnoComponent,
+            },
+            {
+                path: 'turnos',
+                component: TurnosComponent,
+            },
+            
         ]
     },
     {   path: 'login',
