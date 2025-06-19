@@ -11,6 +11,7 @@ import { Component } from '@angular/core';
 import { DisponibilidadComponent } from './components/disponibilidad/disponibilidad.component';
 import { SolicitarTurnoComponent } from './components/solicitar-turno/solicitar-turno.component';
 import { TurnosComponent } from './components/turnos/turnos.component';
+import { MisTurnosComponent } from './components/mis-turnos/mis-turnos.component';
 
 export const routes: Routes = [
 
@@ -50,7 +51,10 @@ export const routes: Routes = [
                 path: 'turnos',
                 component: TurnosComponent,
             },
-            
+            {
+                path: 'mis-turnos',
+                component: MisTurnosComponent,
+            },
         ]
     },
     {   path: 'login',
