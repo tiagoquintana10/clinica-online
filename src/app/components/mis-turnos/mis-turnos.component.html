@@ -1,0 +1,38 @@
+<!--<div *ngIf="usuario?.categoria === 'paciente'">
+
+  <h2>Mis Turnos (Paciente)</h2>
+
+  <input type="text" placeholder="Filtrar por especialidad o especialista" [(ngModel)]="filtro" (input)="filtrarTurnos()" />
+
+  <div *ngFor="let turno of turnosFiltrados" class="turno-card" style="border:1px solid #ccc; margin:10px; padding:10px;">
+    <p><b>Especialidad:</b> {{ turno.especialidad }}</p>
+    <p><b>Especialista:</b> {{ turno.especialista_nombre }}</p>
+    <p><b>Fecha:</b> {{ turno.fecha | date:'short' }}</p>
+    <p><b>Estado:</b> {{ turno.estado }}</p>
+
+    <button *ngIf="mostrarCancelar(turno)" (click)="cancelarTurno(turno)">Cancelar turno</button>
+    <button *ngIf="mostrarVerResena(turno)" (click)="verResena(turno)">Ver reseña</button>
+    <button *ngIf="mostrarCompletarEncuesta(turno)" (click)="completarEncuesta(turno)">Completar encuesta</button>
+    <button *ngIf="mostrarCalificarAtencion(turno)" (click)="calificarAtencion(turno)">Calificar Atención</button>
+  </div>
+</div>
+<div *ngIf="usuario?.categoria === 'especialista'">
+
+  <h2>Mis Turnos (Especialista)</h2>
+
+  <input type="text" placeholder="Filtrar por especialidad o paciente" [(ngModel)]="filtro" (input)="filtrarTurnos()" />
+
+  <div *ngFor="let turno of turnosFiltrados" class="turno-card" style="border:1px solid #ccc; margin:10px; padding:10px;">
+    <p><b>Especialidad:</b> {{ turno.especialidad }}</p>
+    <p><b>Paciente:</b> {{ turno.paciente_nombre }}</p>
+    <p><b>Fecha:</b> {{ turno.fecha | date:'short' }}</p>
+    <p><b>Estado:</b> {{ turno.estado }}</p>
+
+    <button *ngIf="mostrarCancelar(turno)" (click)="cancelarTurno(turno)">Cancelar turno</button>
+    <button *ngIf="mostrarRechazar(turno)" (click)="rechazarTurno(turno)">Rechazar turno</button>
+    <button *ngIf="mostrarAceptar(turno)" (click)="aceptarTurno(turno)">Aceptar turno</button>
+    <button *ngIf="mostrarFinalizar(turno)" (click)="finalizarTurno(turno)">Finalizar turno</button>
+    <button *ngIf="mostrarVerResena(turno)" (click)="verResena(turno)">Ver reseña</button>
+  </div>
+</div>
+-->
