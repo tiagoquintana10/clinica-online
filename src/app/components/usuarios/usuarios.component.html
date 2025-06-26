@@ -1,5 +1,8 @@
 <div class="usuarios-container">
-  <h2>Usuarios Registrados</h2>
+  <div class="header">
+    <h2>Usuarios Registrados</h2>
+    <button (click)="descargarExcelUsuarios()">Descargar Usuarios</button>
+  </div>
 
   <table *ngIf="usuarios.length > 0">
     <thead>
@@ -10,6 +13,7 @@
         <th>Email</th>
         <th>Categoría</th>
         <th>Habilitado</th>
+        <th>Historia clinica</th>
       </tr>
     </thead>
     <tbody>
@@ -27,6 +31,14 @@
           <span *ngIf="usuario.categoria !== 'especialista' && usuario.categoria !== 'administrador'">
             {{ usuario.habilitado ? 'Sí' : 'No' }}
           </span>
+        </td>
+        <td>
+          <button *ngIf="usuario.categoria === 'paciente'"
+            [routerLink]="['/home/usuarios/historias-clinicas']"
+            [queryParams]="{ pacienteId: usuario.id}"
+            >
+            Ver historia clinica
+            </button>
         </td>
       </tr>
     </tbody>
