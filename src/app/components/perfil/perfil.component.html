@@ -23,6 +23,7 @@
       <ul>
         <li *ngFor="let esp of especialidadesDisponibles">{{ esp }}</li>
       </ul>
+      <button [routerLink]="['/home/perfil/agregar-especialidad']">Agregar Especialidad</button>
 
       <div *ngIf="disponibilidad.length > 0">
         <p><strong>Disponibilidad Horaria:</strong></p>
@@ -37,6 +38,16 @@
         <button [routerLink]="['/home/perfil/disponibilidad']">Cargar Horarios</button>
       </div>
     </div>
+
+    <div *ngIf="usuario.categoria === 'paciente'">
+      <button
+        [routerLink]="['/home/usuarios/historias-clinicas']"
+        [queryParams]="{ pacienteId: usuario.id}"
+      >
+        Ver historia clinica            
+      </button>
+    </div>
+
   </div>
 </div>
 
