@@ -12,6 +12,11 @@ import { DisponibilidadComponent } from './components/disponibilidad/disponibili
 import { SolicitarTurnoComponent } from './components/solicitar-turno/solicitar-turno.component';
 import { TurnosComponent } from './components/turnos/turnos.component';
 import { MisTurnosComponent } from './components/mis-turnos/mis-turnos.component';
+import { EspecialidadesComponent } from './components/especialidades/especialidades.component';
+import { AgregarEspecialidadComponent } from './components/agregar-especialidad/agregar-especialidad.component';
+import { PacientesComponent } from './components/pacientes/pacientes.component';
+import { HistoriasClinicasComponent } from './components/historias-clinicas/historias-clinicas.component';
+import { CargarHistoriaClinicaComponent } from './components/cargar-historia-clinica/cargar-historia-clinica.component';
 
 export const routes: Routes = [
 
@@ -31,6 +36,12 @@ export const routes: Routes = [
             {   path: 'usuarios',
                 component: UsuariosComponent,
             },
+            {   path: 'usuarios/historias-clinicas',
+                component: HistoriasClinicasComponent,
+            },
+            {   path: 'especialidades',
+                component: EspecialidadesComponent,
+            },
             {
                 path: 'generar-usuario',
                 component: GenerarUsuarioComponent,
@@ -43,6 +54,9 @@ export const routes: Routes = [
                 path: 'perfil/disponibilidad',
                 component: DisponibilidadComponent
             },
+            {   path: 'perfil/agregar-especialidad',
+                component: AgregarEspecialidadComponent,
+            }, 
             {
                 path: 'solicitar-turno',
                 component: SolicitarTurnoComponent,
@@ -54,6 +68,18 @@ export const routes: Routes = [
             {
                 path: 'mis-turnos',
                 component: MisTurnosComponent,
+            },
+            {
+                path: 'mis-turnos/cargar-historia-clinica',
+                component: CargarHistoriaClinicaComponent,
+            },
+            {
+                path: 'pacientes',
+                component: PacientesComponent,
+            },
+            {
+                path: 'pacientes/historias-clinicas',
+                component: HistoriasClinicasComponent,
             },
         ]
     },
