@@ -2,7 +2,7 @@
   max-width: 500px;
   margin: 0 auto 40px auto;
   padding: 30px 40px;
-  background-color: rgba(255, 255, 255, 0.9); // semitransparente
+  background-color: rgba(255, 255, 255, 0.9); 
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   font-family: 'Segoe UI', sans-serif;
@@ -40,7 +40,6 @@
   }
 
   button {
-    width: 100%;
     background-color: #3498db;
     color: #fff;
     border: none;
@@ -53,10 +52,186 @@
     &:hover {
       background-color: #2980b9;
     }
+    margin-top: 24px;
   }
 }
 .mensaje-error {  
   color: #e74c3c;
   font-weight: 600;
   margin-top: 8px;
+}
+
+
+.especialistas-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.especialista-card {
+  width: 100px; 
+  height: 130px;
+  border-radius: 12px; 
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f8f8f8;
+  
+
+  &:hover {
+    border-color: #3498db;
+    transform: scale(1.05);
+  }
+
+  .especialista-img-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+    }
+  }
+  
+  .nombre-especialista {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+  }
+}
+
+
+.especialidades-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.especialidad-card {
+  width: 140px;
+  border-radius: 8px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+  }
+}
+
+.especialidades-lista h3{
+  width: 100%;                 
+  margin-bottom: 12px;         
+  text-align: center;      
+}
+.especialistas-lista h3 {
+  width: 100%;                 
+  margin-bottom: 12px;         
+  text-align: center;          
+}
+
+.dias-disponibles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px; 
+  justify-content: flex-start; 
+  margin-bottom: 16px;
+}
+
+.dia-card {
+  width: 110px;
+  height: 60px;
+  border-radius: 8px;
+  background-color: #ecf0f1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  padding: 6px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #d0e6f7;
+  }
+  
+  &.selected {
+    background-color: #3498db !important;  
+    color: white !important;               
+    font-weight: 700 !important;
+    border: 2px solid #2c3e50 !important;
+  }
+}
+
+.horas-disponibles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px; 
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
+.hora-card {
+  width: auto;
+  padding: 8px 12px;
+  background-color: #dff0fb;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+  
+
+  &:hover {
+    background-color: #a7d3f1;
+  }
+    
+  &.selected {
+    background-color: #3498db !important; 
+    color: white !important;             
+    font-weight: 700 !important;
+    border: 2px solid #2c3e50 !important;
+  }
 }
