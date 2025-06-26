@@ -5,9 +5,11 @@
       <ul class="nav-links">
         <li *ngIf="esAdmin()"><a [routerLink]="['solicitar-turno']">Cargar Turno</a></li>
         <li *ngIf="esAdmin()"><a [routerLink]="['turnos']">Turnos</a></li>
-        <li *ngIf="esAdmin()"><a [routerLink]="['usuarios']">Gestión De Usuarios</a></li>
         <li *ngIf="esAdmin()"><a [routerLink]="['generar-usuario']">Generar Usuario</a></li>
+        <li *ngIf="esAdmin()"><a [routerLink]="['usuarios']">Gestión De Usuarios</a></li>
+        <li *ngIf="esAdmin()"><a [routerLink]="['especialidades']">Gestion De Especialidades</a></li>
         <li *ngIf="esEspecialista()"><a [routerLink]="['mis-turnos']">Mis Turnos</a></li>
+        <li *ngIf="esEspecialista()"><a [routerLink]="['pacientes']">Pacientes</a></li>
         <li *ngIf="esPaciente()"><a [routerLink]="['solicitar-turno']">Solicitar Turno</a></li>
         <li *ngIf="esPaciente()"><a [routerLink]="['mis-turnos']">Mis Turnos</a></li>
         <li><a [routerLink]="['perfil']">Perfil</a></li>
@@ -24,11 +26,5 @@
     </div>
   </div>
 </div>
-<div *ngIf="!cuentaHabilitada()" class="no-habilitada">
-  <h2>Cuenta no habilitada</h2>
-    <p>Tu cuenta aún no ha sido aprobada por un administrador.</p>
-    <p>Por favor, intentá más tarde o comunicate con soporte.</p>
-</div>
-
 
 <router-outlet></router-outlet>
