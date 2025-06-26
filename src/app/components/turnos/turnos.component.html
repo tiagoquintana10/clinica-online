@@ -54,7 +54,7 @@
 
         <td>{{ t.estado }}</td>
         <td>
-            <div *ngIf="t.estado !== 'aceptado' && t.estado !== 'realizado' && t.estado !== 'rechazado' && t.estado !== 'cancelado'">
+            <div *ngIf="t.estado == 'pendiente'">
             <input type="text" placeholder="Comentario" [(ngModel)]="comentariosAdmin[t.id]" />
             <button (click)="cancelarTurno(t.id, comentariosAdmin[t.id])">Cancelar</button>
             </div>
