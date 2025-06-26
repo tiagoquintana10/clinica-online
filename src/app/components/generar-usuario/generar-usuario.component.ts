@@ -31,6 +31,8 @@ export class GenerarUsuarioComponent implements OnInit{
   };
 
   especialidadesDisponibles: { id: string; nombre: string }[] = [];
+  especialidadesSeleccionadas: any[] = [];
+  especialidadSeleccionada: string = '';
   
   password: string = '';
   avatarFile: File | null = null;
@@ -41,7 +43,7 @@ export class GenerarUsuarioComponent implements OnInit{
   submitted = false;
 
   nuevaEspecialidad: string = '';
-  especialidadSeleccionada: string = '';
+
 
   constructor(private router: Router) {}
 
@@ -52,50 +54,63 @@ export class GenerarUsuarioComponent implements OnInit{
   registrar() {
     this.submitted = true;
     this.errorMsg = '';
-    this.msg = '';
 
     const u = this.usuario;
 
     // para pacientes y datos comunes
-    if (!u.email || !this.password || !u.nombre || !u.apellido || !u.dni || !u.edad || !this.avatarFile || u.categoria === 'paciente' && (!this.avatarFile2 || !u.obra_social)) {
+    if (!u.email || !this.password || !u.nombre || !u.apellido || !u.dni || !u.edad || !this.avatarFile || !u.obra_social || (u.categoria === 'paciente' && !this.avatarFile2)) {
       this.errorMsg = 'Por favor completá todos los campos obligatorios.';
       return;
     }
 
-    //para especialistas y agregar especialidad
-    if (this.especialidadSeleccionada === 'Otro' && this.nuevaEspecialidad.trim() !== '') {
-      supabase
-        .from('especialidades')
-        .insert([{ nombre: this.nuevaEspecialidad.trim(), habilitado: true }])
-        .select('id')
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Error agregando nueva especialidad:', error.message);
-            this.errorMsg = 'No se pudo agregar la nueva especialidad. Intente más tarde.';
-            return;
-          }
-          u.especialidades = [data.id];
-          // hay q validar una vez q ya se agrego la especialidad
-          if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !this.avatarFile || !u.obra_social)) {
-            this.errorMsg = 'Por favor completá todos los campos obligatorios.';
-            return;
-          }
-          this.continuarRegistro(u);
-        });
-    } else {
-    // si seleccionó una existente
-    if (this.especialidadSeleccionada !== 'Otro' && this.especialidadSeleccionada !== '') {
-      u.especialidades = [this.especialidadSeleccionada];
-    }
-
-    // si hay al menos una seleccionada
-    if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !u.obra_social)) {
+    //verificar q haya al menos una especialidad
+    if (u.categoria === 'especialista' && this.especialidadesSeleccionadas.length === 0) {
       this.errorMsg = 'Debés seleccionar al menos una especialidad.';
       return;
     }
 
-    this.continuarRegistro(u);
+    //para especialistas y agregar especialidad
+    if (u.categoria === 'especialista') {
+      this.loadEspecialidades();
+
+      const idsExistentes: string[] = [];
+      const nuevasEspecialidades: string[] = [];
+
+      //Separamos las especialidades q agrega el usuario de las que ya existen
+      this.especialidadesSeleccionadas.forEach(nombre => {
+        const encontrada = this.especialidadesDisponibles.find(e => e.nombre.toLowerCase() === nombre.toLowerCase());
+        if (encontrada) {
+          idsExistentes.push(encontrada.id);
+        } else {
+          nuevasEspecialidades.push(nombre);
+        }
+      });
+
+      if (nuevasEspecialidades.length === 0) {
+        // No agrego especialidades
+        u.especialidades = idsExistentes;
+        this.continuarRegistro(u);
+      } else {
+        // agrego al menos una especialidad
+        supabase
+          .from('especialidades')
+          .insert(nuevasEspecialidades.map(nombre => ({ nombre, habilitado: true })))
+          .select('id')
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('Error agregando nuevas especialidades:', error.message);
+              this.errorMsg = 'Error agregando especialidades. Intente luego.';
+              return;
+            }
+            const nuevosIds = data ? data.map(e => e.id) : [];
+            u.especialidades = idsExistentes.concat(nuevosIds);
+            this.continuarRegistro(u);
+          });
+      }
+
+    } else {
+      // no es especialista
+      this.continuarRegistro(u);
     }
   }
 
@@ -210,19 +225,22 @@ export class GenerarUsuarioComponent implements OnInit{
   }
 
   agregarEspecialidad() {
-    const nueva = this.nuevaEspecialidad.trim();
-    if (nueva) {
-      this.usuario.especialidades = [nueva]; 
-      this.nuevaEspecialidad = '';
+    const nombre = this.especialidadSeleccionada.trim();
+
+    if (!nombre) return;
+
+    if (!this.especialidadesSeleccionadas.includes(nombre)) {
+      this.especialidadesSeleccionadas.push(nombre);
     }
+
+    this.especialidadSeleccionada = '';
   }
 
-  EspecialidadChange() {
-    if (this.especialidadSeleccionada !== 'Otro') {
-      this.usuario.especialidades = [this.especialidadSeleccionada];
-    } else {
-      this.usuario.especialidades = [];
-    }
+
+  eliminarEspecialidad(nombre: string) {
+    this.especialidadesSeleccionadas = this.especialidadesSeleccionadas.filter(
+      esp => esp !== nombre
+    );
   }
 
   loadEspecialidades() {
