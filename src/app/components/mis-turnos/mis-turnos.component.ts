@@ -1,18 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Turno } from '../../models/turnos';
 import { environment } from '../../../environments/environment.prod';
 import { createClient } from '@supabase/supabase-js';
 import { Usuario } from '../../models/usuario';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MockLocationStrategy } from '@angular/common/testing';
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
   selector: 'app-mis-turnos',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,RouterLink],
   templateUrl: './mis-turnos.component.html',
   styleUrl: './mis-turnos.component.scss'
 })
@@ -21,8 +22,14 @@ export class MisTurnosComponent implements OnInit {
   usuario: Usuario | null = null;
   turnos: any[] = [];
 
+  comentariosEspecialista: Record<string, string> = {};
+  comentariosPaciente: Record<string, string> = {};
+  puntajeSeleccionado: { [Id: string]: string } = {}; 
+  resenasVisibles: { [id: string]: boolean } = {};
+  encuestaVisible: { [id: string]: boolean } = {};
+  calificacionVisible: { [id: string]: boolean } = {};  
+  msgError:{ [key: string] : string } = {};
 
-    
   constructor(private router : Router){}
 
   ngOnInit(): void {
@@ -45,8 +52,9 @@ export class MisTurnosComponent implements OnInit {
       }  
       console.log('Data:',data);
       this.usuario = data; 
+
+      this.loadTurnos();
       })
-      
     });
   }
 
@@ -75,6 +83,145 @@ export class MisTurnosComponent implements OnInit {
         }));
       });
   }
+
+
+  cancelarTurno(turnoId: string, motivo: string) {
+    if (!motivo || motivo.trim() === '') {
+      this.msgError[turnoId] = 'Debes ingresar un comentario para cancelar el turno';
+      return;
+    }
+
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ estado: 'cancelado', comentario: motivo })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al cancelar turno:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+
+  
+  verResena(turno: any){
+    this.resenasVisibles[turno.id] = !this.resenasVisibles[turno.id];
+  }
+
+  verEncuesta(turno: any) {
+    this.encuestaVisible[turno.id] = !this.encuestaVisible[turno.id];
+  }
+
+  verCalificacion(turno: any) {
+    this.calificacionVisible[turno.id] = !this.calificacionVisible[turno.id];
+  }
+
+  
+  completarEncuesta(turnoId: string, encuesta: string) {
+    if (!encuesta || encuesta.trim() === '') {
+      this.msgError[turnoId] = 'Debe ingresar un comentario para completar la encuesta';
+      return;
+    }
+
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ encuesta: encuesta })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al completar encuesta:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+
+  calificarAtencion(turnoId: string, puntaje: string) {
+    this.puntajeSeleccionado[turnoId] = puntaje; 
+  }
+
+  enviarCalificacion(turnoId: string) {
+    const puntaje = this.puntajeSeleccionado[turnoId];
+    if (!puntaje || !/^[1-9]$|^10$/.test(puntaje.trim())) {
+      this.msgError[turnoId] = 'Debe calificar la atención del 1 al 10';
+      return;
+    }
+
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ calificacion: puntaje })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al calificar atención:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+  
+  
+  rechazarTurno(turnoId: string, motivo: string) {
+    if (!motivo || motivo.trim() === '') {
+      this.msgError[turnoId] = 'Debe ingresar un comentario para rechazar el turno';
+      return;
+    }
+
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ estado: 'rechazado', comentario: motivo })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al rechazar turno:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+
+  
+  aceptarTurno(turnoId: string) {
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ estado: 'aceptado' })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al aceptar turno:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+
+  
+  finalizarTurno(turnoId: string, resena: string) {
+    if (!resena || resena.trim() === '') {
+      this.msgError[turnoId] = 'Debe ingresar una reseña para finalizar el turno';
+      return;
+    }
+
+    this.msgError[turnoId] = '';
+    supabase
+      .from('turnos')
+      .update({ estado: 'realizado', reseña: resena })
+      .eq('id', turnoId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error al finalizar turno:', error.message);
+        } else {
+          this.loadTurnos();
+        }
+      });
+  }
+
 
 
 }
