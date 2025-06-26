@@ -1,8 +1,8 @@
-<div class="solicitar-turno-container" *ngIf="usuario">
+<div class="solicitar-turno-container" *ngIf="usuario && esAdmin()">
   <h2>Solicitar Turno</h2>
 
   <!-- solo para admin -->
-  <div *ngIf="esAdmin()">
+  <div>
     <label for="paciente">Paciente:</label>
     <select id="paciente" [(ngModel)]="turno.paciente_id" name = "paciente">
       <option value="">Seleccione un paciente</option>
@@ -22,16 +22,15 @@
     </select>
 
     <div *ngIf="sinEspecialistas" class="mensaje-error">  
-        No hay especialistas disponibles para esta especialidad.
+        <p>No hay especialistas disponibles para esta especialidad.</p>
     </div>
   </div>
 
-
-  <div *ngIf="especialistas.length > 0">
+  <div *ngIf="especialistasPorEspecialidad.length > 0">
     <label for="especialista">Especialista:</label>
     <select id="especialista" [(ngModel)]="turno.especialista_id" (change)="onEspecialistaChange($any($event.target).value)" name = "especialista">
       <option value="">Seleccione un especialista</option>
-      <option *ngFor="let e of especialistas" [value]="e.id">
+      <option *ngFor="let e of especialistasPorEspecialidad" [value]="e.id">
         {{ e.nombre }} {{ e.apellido }}
       </option>
     </select>
@@ -42,7 +41,7 @@
   </div>
 
 
-  <div *ngIf="diasDisponibles.length > 0 || cargaDisponibilidad">
+  <div *ngIf="diasDisponibles.length > 0 || cargaDisponibilidad && especialistasPorEspecialidad.length > 0">
     <label for="fecha">Día:</label>
     <select id="fecha" [(ngModel)]="diaSeleccionado" name = "fecha" (change)="onDiaSeleccionadoChange()">
       <option value="">Seleccione un día</option>
@@ -58,6 +57,55 @@
     </select>
   </div>
 
-
   <button (click)="crearTurno()">Confirmar Turno</button>
+</div>
+
+
+<div class="solicitar-turno-container" *ngIf="usuario && !esAdmin()">
+  <h2>Solicitar Turno</h2>
+
+  <div class="especialistas-lista" *ngIf="!turno.especialista_id">
+    <h3>Seleccione un Especialista</h3>
+    <div class="especialista-card" *ngFor="let esp of especialistas" (click)="onEspecialistaChange(esp.id)">
+      <div class="especialista-img-container">
+        <img [src]="getAvatarUrl(esp.url_img1)" alt="Especialista" />
+      </div>
+      <p class="nombre-especialista">{{ esp.nombre }} {{ esp.apellido }}</p>
+    </div>
+  </div>
+
+  <div class="especialidades-lista" *ngIf="turno.especialista_id && !turno.especialidad && especialidadesPorEspecialista.length > 0">
+    <h3>Seleccione una Especialidad</h3>
+    <div class="especialidad-card" *ngFor="let esp of especialidadesPorEspecialista" (click)="onEspecialidadChange(esp)">
+      <img [src]="'assets/default.png'" alt="Especialidad" />
+      <p>{{ esp }}</p>
+    </div>
+  </div>
+
+
+  <div *ngIf="turno.especialista_id && turno.especialidad && (diasDisponibles.length > 0 || cargaDisponibilidad)">
+    <h3>Seleccione un dia</h3>
+    <div class="dias-disponibles">
+      <button
+        *ngFor="let dia of diasDisponibles"
+        class="dia-card"
+        [class.selected]="diaSeleccionado === dia.fecha"
+        (click)="diaSeleccionado = dia.fecha; diaSeleccionadoChange(dia.fecha)">
+        {{ dia.fecha | date: 'dd-MM-yyyy' }}
+      </button>
+    </div>
+
+    <h3>Seleccione un Horario</h3>
+    <div class="horas-disponibles">
+      <button
+        *ngFor="let hora of getHorariosParaDiaSeleccionado()"
+        class="hora-card"
+        [class.selected]="horaSeleccionada === hora"
+        (click)="onHoraSeleccionadaChange(hora)">
+        {{ hora }}
+      </button>
+    </div>
+  </div>
+
+  <button *ngIf="turno.especialista_id && turno.especialidad" (click)="crearTurno()">Confirmar Turno</button>
 </div>
