@@ -46,24 +46,22 @@
       <input type="text" [(ngModel)]="usuario.obra_social" name="obraSocial" />
     </div>
 
-    <div class="form-row" *ngIf="usuario.categoria === 'especialista'">
-        <label>Especialidades:</label>
-        <select [(ngModel)]="especialidadSeleccionada" name="especialidades" (change)="EspecialidadChange()">
-            <option value="" disabled selected>Elija una especialidad</option>
-            <option *ngFor="let esp of especialidadesDisponibles" [value]="esp.id">{{ esp.nombre }}</option>
-            <option value="Otro">Otro</option>
-        </select>
+    <div class="form-row especialidad-input-group" *ngIf="usuario.categoria === 'especialista'"> 
+      <label>Especialidades:</label>
+      <input list="especialidades" [(ngModel)]="especialidadSeleccionada" name="especialidadSeleccionada" placeholder="Seleccioná o agrega una especialidad" />
+      <datalist id="especialidades">
+        <option *ngFor="let esp of especialidadesDisponibles" [value]="esp.nombre"></option>
+      </datalist>
+      <button type="button" (click)="agregarEspecialidad()">Agregar</button>
 
-        <div class="form-row" *ngIf="especialidadSeleccionada === 'Otro'  && usuario.especialidades?.length === 0">
-          <input
-            type="text"
-            placeholder="Agregar nueva especialidad"
-            [(ngModel)]="nuevaEspecialidad"
-            name="nuevaEspecialidad"
-          />
-        </div>
+      <div class="especialidades-lista">
+        <span *ngFor="let esp of especialidadesSeleccionadas" class="chip">
+          {{ esp }}
+          <button type="button" (click)="eliminarEspecialidad(esp)">x</button>
+        </span>
+      </div>
     </div>
-    
+        
     <div class="form-row" *ngIf="especialidadSeleccionada === 'Otro' && usuario.especialidades?.length === 1">
       <strong>Especialidad agregada:</strong> {{ usuario.especialidades?.[0] }}
     </div>
