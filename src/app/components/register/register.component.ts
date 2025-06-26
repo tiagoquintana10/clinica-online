@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Router,RouterModule } from '@angular/router';
 import { createClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment.prod';
@@ -16,7 +16,7 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit{
+export class RegisterComponent implements OnInit, AfterViewInit{
 
   usuario: Usuario = {
       nombre: '',
@@ -33,6 +33,8 @@ export class RegisterComponent implements OnInit{
   };
 
   especialidadesDisponibles: {id:string; nombre:string}[] = [];
+  especialidadSeleccionada: string = '';
+  especialidadesSeleccionadas: string[] = [];
   
   password: string = '';
   avatarFile: File | null = null;
@@ -42,7 +44,8 @@ export class RegisterComponent implements OnInit{
   submitted = false;
 
   nuevaEspecialidad: string = '';
-  especialidadSeleccionada: string = '';
+
+  tipoSeleccionado: boolean = false;
 
   constructor(private router: Router) {}
 
@@ -50,9 +53,29 @@ export class RegisterComponent implements OnInit{
     this.loadEspecialidades();    
   }
 
+  ngAfterViewInit() {
+    const checkInterval = setInterval(() => {
+      const captchaDiv = document.getElementById('captcha');
+      if (captchaDiv && (window as any).grecaptcha) {
+        (window as any).grecaptcha.render('captcha', {
+          'sitekey': '6LeeBGgrAAAAAJ3-Ql_0OZVwhaf4U1Y2uCKvu_uQ'
+        });
+        clearInterval(checkInterval);
+      }
+    }, 500);
+  }
+
   registrar() {
     this.submitted = true;
     this.errorMsg = '';
+
+    const token = (window as any).grecaptcha.getResponse();
+    if (!token) {
+      this.errorMsg = 'Por favor completá el captcha.';
+      return;
+    }
+
+
 
     const u = this.usuario;
 
@@ -62,40 +85,54 @@ export class RegisterComponent implements OnInit{
       return;
     }
 
-    //para especialistas y agregar especialidad
-    if (this.especialidadSeleccionada === 'Otro' && this.nuevaEspecialidad.trim() !== '') {
-      supabase
-        .from('especialidades')
-        .insert([{ nombre: this.nuevaEspecialidad.trim(), habilitado: false }])
-        .select('id')
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Error agregando nueva especialidad:', error.message);
-            this.errorMsg = 'No se pudo agregar la nueva especialidad. Intente más tarde.';
-            return;
-          }
-          u.especialidades = [data.id];
-          // hay q validar una vez q ya se agrego la especialidad
-          if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !this.avatarFile)) {
-            this.errorMsg = 'Debés seleccionar al menos una especialidad.';
-            return;
-          }
-          this.continuarRegistro(u);
-        });
-    } else {
-    // si seleccionó una existente
-    if (this.especialidadSeleccionada !== 'Otro' && this.especialidadSeleccionada !== '') {
-      u.especialidades = [this.especialidadSeleccionada];
-    }
-
-    // si hay al menos una seleccionada
-    if (u.categoria === 'especialista' && (!u.especialidades || u.especialidades.length === 0 || !u.obra_social)) {
+    //verificar q haya al menos una especialidad
+    if (u.categoria === 'especialista' && this.especialidadesSeleccionadas.length === 0) {
       this.errorMsg = 'Debés seleccionar al menos una especialidad.';
       return;
     }
 
-    this.continuarRegistro(u);
+    //para especialistas y agregar especialidad
+    if (u.categoria === 'especialista') {
+      this.loadEspecialidades();
+
+      const idsExistentes: string[] = [];
+      const nuevasEspecialidades: string[] = [];
+
+      //Separamos las especialidades q agrega el usuario de las que ya existen
+      this.especialidadesSeleccionadas.forEach(nombre => {
+        const encontrada = this.especialidadesDisponibles.find(e => e.nombre.toLowerCase() === nombre.toLowerCase());
+        if (encontrada) {
+          idsExistentes.push(encontrada.id);
+        } else {
+          nuevasEspecialidades.push(nombre);
+        }
+      });
+
+      if (nuevasEspecialidades.length === 0) {
+        // No agrego especialidades
+        u.especialidades = idsExistentes;
+        this.continuarRegistro(u);
+      } else {
+        // agrego al menos una especialidad
+        supabase
+          .from('especialidades')
+          .insert(nuevasEspecialidades.map(nombre => ({ nombre, habilitado: false })))
+          .select('id')
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('Error agregando nuevas especialidades:', error.message);
+              this.errorMsg = 'Error agregando especialidades. Intente luego.';
+              return;
+            }
+            const nuevosIds = data ? data.map(e => e.id) : [];
+            u.especialidades = idsExistentes.concat(nuevosIds);
+            this.continuarRegistro(u);
+          });
+      }
+
+    } else {
+      // no es especialista
+      this.continuarRegistro(u);
     }
   }
 
@@ -215,4 +252,34 @@ export class RegisterComponent implements OnInit{
         this.especialidadesDisponibles = data || [];
       });    
   }
+
+  seleccionarTipo(tipo: 'paciente' | 'especialista') {
+    this.tipoSeleccionado = true;
+    this.usuario.categoria = tipo;
+  }
+
+  obtenerNombreEspecialidad(id: string): string {
+    const especialidad = this.especialidadesDisponibles.find(e => e.id === id);
+    return especialidad ? especialidad.nombre : 'Especialidad desconocida';
+  }
+
+  agregarEspecialidad() {
+    const nombre = this.especialidadSeleccionada.trim();
+
+    if (!nombre) return;
+
+    if (!this.especialidadesSeleccionadas.includes(nombre)) {
+      this.especialidadesSeleccionadas.push(nombre);
+    }
+
+    this.especialidadSeleccionada = '';
+  }
+
+
+  eliminarEspecialidad(nombre: string) {
+    this.especialidadesSeleccionadas = this.especialidadesSeleccionadas.filter(
+      esp => esp !== nombre
+    );
+  }
+
 }
