@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment.prod';
 import { FormsModule } from '@angular/forms';
@@ -13,23 +13,24 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
 
   mail: string = "";
   password: string = "";
 
-  constructor(private router : Router){
-    this.loadRegisteredEmails();
-  } 
-  
   submitted: boolean = false;
   incorrect: boolean = false;
   errorMsg : string = '';
 
-  registeredEmails: string[] = [];
-  filteredEmails: string[] = [];
-  showSuggestions = false;
 
+  usuarios: any[] = [];
+
+  constructor(private router : Router){}
+  
+  ngOnInit(): void {
+    this.loadUsersFastAcces();
+  }
+  
   login(){
     this.submitted = true;
     this.errorMsg = '';
@@ -53,44 +54,61 @@ export class LoginComponent {
         }
         console.error('Error:', error.message)
       }else{
-        this.router.navigate(['home']);
+
+        supabase
+        .from('usuarios')
+        .select('habilitado')
+        .eq('email', this.mail)
+        .single()
+        .then(({ data, error}) => {
+          if(error) {
+            console.error('Error verificando usuario habilitado:', error.message);
+            this.errorMsg = 'Error interno, intente más tarde';
+            return;
+          }
+
+          if(!data.habilitado) {
+            this.errorMsg = 'Tu cuenta aún no ha sido habilitada por un administrador';
+            supabase.auth.signOut(); //cierro sesion inmediatamente, ya que inicia sesion si el email esta confirmado y las credenciales son correctas
+            return;
+          }
+
+          this.router.navigate(['home']);
+        })
       }
     });
-
   }
 
-  loadRegisteredEmails() {
+  getAvatarUrl(avatarUrl: string) {
+    return supabase.storage.from('images').getPublicUrl(avatarUrl).data.publicUrl;
+  }
+
+  loadUsersFastAcces(){
     supabase
       .from('usuarios')
-      .select('email')
+      .select('email, url_img1, categoria')
       .then(({ data, error }) => {
         if (error) {
-          console.error('Error cargando emails:', error.message);
+          console.error('Error cargando accesos rápidos:', error.message);
           return;
         }
-        this.registeredEmails = (data || [])
-          .map((item: any) => item.email)
-          .filter((email: string) => !!email);
+
+        const pacientes = data.filter(u => u.categoria === 'paciente').slice(0, 3);
+        const especialistas = data.filter(u => u.categoria === 'especialista').slice(0, 2);
+        const admins = data.filter(u => u.categoria === 'administrador').slice(0, 1);
+
+        this.usuarios = [...pacientes, ...especialistas, ...admins].map(user => ({
+          email: user.email,
+          avatar: this.getAvatarUrl(user.url_img1)
+            ? this.getAvatarUrl(user.url_img1)
+            : 'assets/default-avatar.png',
+          categoria: user.categoria
+        }));
       });
-  } 
+  }
 
-  selectEmail(selectedEmail: string) {
-    this.mail = selectedEmail;
+  completarEmail(user: any){ 
+    this.mail = user.email;
     this.password = '';
-    this.showSuggestions = false;
   }
-  
-  inputEmail() {
-    this.filteredEmails = this.registeredEmails.filter(email =>
-      email.toLowerCase().includes(this.mail.toLowerCase())
-    );
-    this.showSuggestions = this.filteredEmails.length > 0;
-}
-
-  esconderSuggestions() {
-    setTimeout(() => {
-      this.showSuggestions = false;
-    }, 150);
-  }
-
 }
