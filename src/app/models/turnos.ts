@@ -7,5 +7,6 @@ export interface Turno {
   fecha: string; 
   estado: string;
   resena?: string;
+  historia_clinica: boolean;
   calificacion?: string;
 }
