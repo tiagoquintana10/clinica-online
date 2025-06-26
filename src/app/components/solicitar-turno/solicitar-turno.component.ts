@@ -26,9 +26,11 @@ export class SolicitarTurnoComponent implements OnInit{
       fecha: ''
     }as Turno;
     pacientes: Usuario [] = [];
+    especialistasPorEspecialidad: Usuario[] = [];
     especialistas: Usuario[] = [];
 
     especialidadesDisponibles: string[] = [];
+    especialidadesPorEspecialista: string[] = [];
 
     cargaDisponibilidad: boolean = false;
     diasDisponibles: { fecha: string, textoVisible: string }[] = [];          // Días habilitados por el especialista
@@ -45,7 +47,6 @@ export class SolicitarTurnoComponent implements OnInit{
   
     ngOnInit(){
       this.getUserData();
-      this.loadEspecialidades();
     }
 
     getUserData(){
@@ -65,7 +66,12 @@ export class SolicitarTurnoComponent implements OnInit{
 
           if(this.esAdmin()){
             this.loadPacientes();
+            this.loadEspecialidades();
           }
+          else{
+            this.loadEspecialistas();
+          }
+
         })
         
       });
@@ -96,7 +102,6 @@ export class SolicitarTurnoComponent implements OnInit{
     }
     
     loadEspecialidades(){
-      
       supabase
         .from('especialidades')
         .select('id, nombre')
@@ -112,7 +117,42 @@ export class SolicitarTurnoComponent implements OnInit{
         });
     }
 
-    loadEspecialistas(nombreEspecialidad: string){
+    loadEspecialidadesPorEspecialista(espIds: string[]){
+      if(!espIds.length){
+        return;
+      }
+
+      supabase
+        .from('especialidades')
+        .select('id, nombre')
+        .eq('habilitado', true)
+        .in('id',espIds)
+        .then(({data,error}) =>{
+          if(error){
+            console.error('Error al cargar especialidades del especialista', error.message);
+            return;
+          }
+          this.especialidadesPorEspecialista = (data || []).map(e => e.nombre);
+        })
+    }
+
+    loadEspecialistas(){
+      supabase
+        .from('usuarios')
+        .select('id, nombre, apellido, url_img1, especialidades')
+        .eq('categoria', 'especialista')
+        .eq('habilitado', true)
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error cargando especialistas:', error.message);
+            return;
+          }
+          console.log('Especialistas:', data);
+          this.especialistas = data as Usuario[]; 
+        });      
+    }
+
+    loadEspecialistasPorEspecialidad(nombreEspecialidad: string){
       if (!nombreEspecialidad){
         this.especialistas = [];
         this.sinEspecialistas = false;
@@ -145,8 +185,8 @@ export class SolicitarTurnoComponent implements OnInit{
               }
 
               console.log('Especialistas:', data);
-              this.especialistas = data as Usuario[];
-              this.sinEspecialistas = this.especialistas.length === 0; 
+              this.especialistasPorEspecialidad = data as Usuario[];
+              this.sinEspecialistas = this.especialistasPorEspecialidad.length === 0; 
               this.sinDisponibilidadHoraria = false;
             });
         });
@@ -307,28 +347,51 @@ export class SolicitarTurnoComponent implements OnInit{
     }
 
     onEspecialidadChange(nombreEspecialidad: string) {
-      this.turno.especialidad = nombreEspecialidad;
-      this.turno.especialista_id = '';           
+      this.turno.especialidad = nombreEspecialidad;           
       this.diaSeleccionado = '';                 
-      this.horaSeleccionada = '';                
-      this.especialistas = [];                   
-      this.diasDisponibles = [];                 
-      this.horasDisponibles = {};
-      this.loadEspecialistas(nombreEspecialidad);
+      this.horaSeleccionada = '';                                   
+
+
+      if(this.esAdmin()){
+        this.turno.especialista_id = '';
+        this.especialistasPorEspecialidad = [];
+        this.loadEspecialistasPorEspecialidad(nombreEspecialidad);
+        this.diasDisponibles = [];                 
+        this.horasDisponibles = {};
+      }
+      
     }
 
-    onEspecialistaChange(especialistaId: string) {
+    onEspecialistaChange(especialistaId: any) {
       this.turno.especialista_id = especialistaId;
       this.diaSeleccionado = '';                 
       this.horaSeleccionada = '';                
       this.diasDisponibles = [];                 
-      this.horasDisponibles = {};      
+      this.horasDisponibles = {};
+      
+      if (!this.esAdmin()) {
+        const especialista = this.especialistas.find(e => e.id === especialistaId);
+        if (especialista && especialista.especialidades) {
+          this.loadEspecialidadesPorEspecialista(especialista.especialidades);
+        }
+      }      
+
       this.loadDisponibilidad(especialistaId);
     }
 
-    onDiaSeleccionadoChange() {
-      this.horaSeleccionada = '';
-    }
+  onDiaSeleccionadoChange() {
+    this.horaSeleccionada = '';
+  }
+
+
+  diaSeleccionadoChange(nuevoDia: string) {
+    this.diaSeleccionado = nuevoDia;
+    this.horaSeleccionada = ''; 
+  }
+
+  onHoraSeleccionadaChange(hora: string) {
+    this.horaSeleccionada = hora;
+  }
 
     // genera las proximas n fechas  
     getFechasProximas(n: number): Date[] {
@@ -361,5 +424,9 @@ export class SolicitarTurnoComponent implements OnInit{
       }
 
       return horarios;
+    }
+
+    getAvatarUrl(avatarUrl: string) {
+      return supabase.storage.from('images').getPublicUrl(avatarUrl).data.publicUrl;
     }
 }
