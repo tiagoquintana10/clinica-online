@@ -6,12 +6,16 @@ import { Usuario } from '../../models/usuario';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FiltroEspecialidadPipe } from '../../pipes/filtroEspecialidad.pipe';
+import { FiltroEspecialistaPipe } from '../../pipes/filtroespecialista.pipe';
+
+
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
   selector: 'app-turnos',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,FiltroEspecialidadPipe,FiltroEspecialidadPipe,FiltroEspecialistaPipe],
   templateUrl: './turnos.component.html',
   styleUrl: './turnos.component.scss'
 })
@@ -24,14 +28,12 @@ export class TurnosComponent implements OnInit{
   especialidades: string[] = [];
   sinEspecialistas: boolean = false;
 
-  filtroEspecialista: string = '';
-  filtroEspecialidad: string = '';
-  filtroEspecialistaNombre: string = '';
-
   msgCancelarTurno: string = '';
 
   comentariosAdmin: Record<string, string> = {}; //para que pueda guardar el id del turno al q corresponde
   
+  busquedaEspecialista: string = '';
+  busquedaEspecialidad: string = '';
 
   constructor(private router: Router){}
 
@@ -137,17 +139,7 @@ export class TurnosComponent implements OnInit{
   }
 
   loadTurnos() {
-    const filtros: any = {};
 
-    if (this.filtroEspecialista) {
-      filtros.especialista_id = this.filtroEspecialista;
-    }
-
-    if (this.filtroEspecialidad) {
-      filtros.especialidad = this.filtroEspecialidad;
-    }
-
-    
     supabase
       .from('turnos')
       .select(`
@@ -160,7 +152,6 @@ export class TurnosComponent implements OnInit{
         paciente:paciente_id ( nombre, apellido ),
         especialista:especialista_id ( nombre, apellido )
       `)
-      .match(filtros)
       .order('fecha', { ascending: true })
       .then(({ data, error }) => {
         if (error) {
@@ -185,7 +176,7 @@ export class TurnosComponent implements OnInit{
   }
 
 
-  cancelarTurno(turnoId: string, comentario: string) {
+  cancelarTurno(turnoId: number, comentario: string) {
     this.msgCancelarTurno = '';
     
     
@@ -206,40 +197,6 @@ export class TurnosComponent implements OnInit{
         this.loadTurnos(); 
         this.msgCancelarTurno = '';
       });
-  }
-
-
-  onFiltroEspecialidadChange(nombre: string) {
-    this.filtroEspecialidad = nombre;
-
-    if (!nombre) {
-      
-      this.filtroEspecialista = '';
-      this.filtroEspecialistaNombre = '';
-      this.loadEspecialistas();  
-    } else {
-      this.filtroEspecialista = '';
-      this.filtroEspecialistaNombre = '';
-      this.loadEspecialistasEspecialidad(nombre); 
-    }
-    
-    this.loadTurnos();
-  }
-
-  onFiltroEspecialistaChange(apellido: string) {
-  this.filtroEspecialistaNombre = apellido;
-
-  const esp = this.especialistas.find(
-    e => `${e.nombre} ${e.apellido}`.toLowerCase() === apellido.toLowerCase()
-  );
-
-  if (esp) {
-    this.filtroEspecialista = esp.id; 
-  } else {
-    this.filtroEspecialista = '';
-  }
-
-  this.loadTurnos();
   }
 
 }
