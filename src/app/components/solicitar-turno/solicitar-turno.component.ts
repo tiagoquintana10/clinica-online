@@ -30,7 +30,7 @@ export class SolicitarTurnoComponent implements OnInit{
     especialistas: Usuario[] = [];
 
     especialidadesDisponibles: string[] = [];
-    especialidadesPorEspecialista: string[] = [];
+    especialidadesPorEspecialista:{ id: string, nombre: string, url_img1?: string }[] = [];
 
     cargaDisponibilidad: boolean = false;
     diasDisponibles: { fecha: string, textoVisible: string }[] = [];          // Días habilitados por el especialista
@@ -124,7 +124,7 @@ export class SolicitarTurnoComponent implements OnInit{
 
       supabase
         .from('especialidades')
-        .select('id, nombre')
+        .select('id, nombre,url_img1')
         .eq('habilitado', true)
         .in('id',espIds)
         .then(({data,error}) =>{
@@ -132,7 +132,7 @@ export class SolicitarTurnoComponent implements OnInit{
             console.error('Error al cargar especialidades del especialista', error.message);
             return;
           }
-          this.especialidadesPorEspecialista = (data || []).map(e => e.nombre);
+          this.especialidadesPorEspecialista = (data || []);
         })
     }
 
@@ -429,4 +429,17 @@ export class SolicitarTurnoComponent implements OnInit{
     getAvatarUrl(avatarUrl: string) {
       return supabase.storage.from('images').getPublicUrl(avatarUrl).data.publicUrl;
     }
+
+    formatoHoraAMPM(hora: string): string {
+      const [h, m] = hora.split(':').map(Number);
+      const date = new Date();
+      date.setHours(h, m, 0);
+
+      const horas12 = date.getHours() % 12 || 12;
+      const minutos = date.getMinutes().toString().padStart(2, '0');
+      const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+      return `${horas12}:${minutos} ${ampm}`;
+    }
+
 }
