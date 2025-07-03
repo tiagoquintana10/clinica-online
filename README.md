@@ -8,8 +8,20 @@ ClinicaOnline es una aplicación web diseñada para facilitar la gestión y rese
 
 La app comienza aqui, si ya tienes un usuario puedes iniciar sesion, sino deberas crear uno antes
 
-
 ![image](https://github.com/user-attachments/assets/aa7b93e9-d88c-461e-9193-e22a04aaf769)
+
+Una vez que ya tienes un usuario registrado podras iniciar sesion desde este login que cuenta con algunos accesos rapidos para facilitar el inicio de sesion
+
+![image](https://github.com/user-attachments/assets/06515d30-50d7-48cf-a1d6-ba20f97914fa)
+
+Una vez que hayas iniciado sesion como paciente la app te llevara a este home dese el cual, podras acceder a las distintas secciones que ofrece la app desde la barra de navegacion
+
+![image](https://github.com/user-attachments/assets/838d2689-b733-46e8-8e35-5d087618f81d)
+
+Para solicitar un turno primero deberas seleccionar el especialista con el que quieres tomar un turno
+
+
+
 
 
 ## Development server
