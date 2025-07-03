@@ -15,7 +15,6 @@
   <div *ngIf="historiasClinicasPaciente.length > 0" class="historias-lista">
     <div class="historia-item" *ngFor="let historia of historiasClinicasPaciente">
       
-      
       <div class="datos-turno" *ngIf="turnosIds[historia.turno_id] as turno">
         <h4>Turno</h4>
         <div class="turno-grid">
@@ -24,25 +23,36 @@
           <div><strong>Especialidad:</strong> {{ turno.especialidad }}</div>
           <div><strong>Hora:</strong> {{ turno.fecha | date:'HH:mm' }}</div>
         </div>
-      </div>
+      
 
       
-      <div class="contenedor-datos">
-        <div class="datos-fijos">
-          <h4>Datos Básicos</h4>
-          <div><strong>Altura:</strong> {{ historia.altura }} cm</div>
-          <div><strong>Peso:</strong> {{ historia.peso }} kg</div>
-          <div><strong>Temp.:</strong> {{ historia.temperatura }} °C</div>
-          <div><strong>Presión:</strong> {{ historia.presion }}</div>
+        <div class="contenedor-datos">
+          <div class="datos-fijos">
+            <h4>Datos Básicos</h4>
+            <div><strong>Altura:</strong> {{ historia.altura }} cm</div>
+            <div><strong>Peso:</strong> {{ historia.peso }} kg</div>
+            <div><strong>Temp.:</strong> {{ historia.temperatura }} °C</div>
+            <div><strong>Presión:</strong> {{ historia.presion }}</div>
+          </div>
+
+          <div *ngIf="historia.datos_dinamicos && objectKeys(historia.datos_dinamicos).length" class="datos-dinamicos">
+            <h4>Extras</h4>
+            <div *ngFor="let clave of objectKeys(historia.datos_dinamicos)" class="dato-extra">
+              <strong>{{ clave }}:</strong> {{ historia.datos_dinamicos[clave] }}
+            </div>
+          </div>
         </div>
-        <div *ngIf="historia.datos_dinamicos && objectKeys(historia.datos_dinamicos).length" class="datos-dinamicos">
-          <h4>Extras</h4>
-          <div *ngFor="let clave of objectKeys(historia.datos_dinamicos)" class="dato-extra">
-            <strong>{{ clave }}:</strong> {{ historia.datos_dinamicos[clave] }}
+
+        <div *ngIf="turno['reseña']" class="reseña-historia">
+          <button (click)="verResena(turno)">
+            {{ resenasVisibles[turno.id] ? 'Ocultar Reseña' : 'Ver Reseña' }}        
+          </button>
+          <div *ngIf="resenasVisibles[turno.id]" class="reseña-visible">
+            <strong>Reseña:</strong> {{turno['reseña']}}
           </div>
         </div>
       </div>
-
+    
     </div>
   </div>
 
