@@ -18,10 +18,23 @@ Una vez que hayas iniciado sesion como paciente la app te llevara a este home de
 
 ![image](https://github.com/user-attachments/assets/838d2689-b733-46e8-8e35-5d087618f81d)
 
-Para solicitar un turno primero deberas seleccionar el especialista con el que quieres tomar un turno
+Para solicitar un turno deberas dirigirte a la seccion "Solicitar turno" en la barra de navegacion y en la primera parte deberas seleccionar el especialista con el que quieres tomar un turno
 
+![image](https://github.com/user-attachments/assets/45d462e4-02b4-4732-bf77-1a9715e729a5)
 
+Luego una de sus especialidades
 
+![image](https://github.com/user-attachments/assets/0ede19ab-e58d-4efb-8a19-f602a1d89d44)
+
+Y por ultimo un dia y horario que nos ofrece la app para ese especialista y esa especialidad y luego tocar el boton de "Confirmar Turno"
+
+![image](https://github.com/user-attachments/assets/9185b6c1-b3a3-4c65-b167-1f3c0811cc87)
+
+Luego si quieres ver tus turnos tendras que dirigirte a la seccion "Mis turnos" en la barra de navegacion y ahi podras ver todos tus turnos con sus respectivos estados, esta seccion cuenta con una serie de filtros por los que podras buscar turnos especificas segun el filtro que uses
+
+![image](https://github.com/user-attachments/assets/a3ca20f9-7895-4472-8c2c-d07591b48825)
+
+Por ultimo si te diriges a la seccion "Perfil" en la barra de navegacion podras ver tus datos personales y ademas tendras la posibilidad de ver o descargar tu historia clinica con los botones "Ver historia clinica" y "Descargar historia clinica"
 
 
 ## Development server
