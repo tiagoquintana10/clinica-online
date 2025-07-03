@@ -2,31 +2,15 @@
   <h2>Turnos de la clínica</h2>
 
   <!-- Filtros -->
-  <div>
-    <label>Especialidad:</label>
-    <input
-        list="especialidades"
-        [(ngModel)]="filtroEspecialidad"
-        (change)="onFiltroEspecialidadChange(filtroEspecialidad)"
-    />
-    <datalist id="especialidades">
-        
-        <option *ngFor="let esp of especialidades" [value]="esp"></option>
-    </datalist>
-
-    <label>Especialista:</label>
-    <input
-        list="especialistas"
-        [(ngModel)]="filtroEspecialistaNombre"
-        (change)="onFiltroEspecialistaChange(filtroEspecialistaNombre)"
-    />
-    <datalist id="especialistas">
-        
-        <option
-        *ngFor="let esp of especialistas"
-        [value]="esp.nombre + ' ' + esp.apellido"
-        ></option>
-    </datalist>
+  <div class="filtros">
+    <div class="filtro-item">  
+      <label for="filtro-especialidad">Especialidad:</label>
+      <input id="filtro-especialidad" type="text" [(ngModel)]="busquedaEspecialidad" placeholder="Buscar por especialidad"/>
+    </div>
+    <div class="filtro-item">
+      <label for="filtro-especialista">Especialista:</label>
+      <input id="filtro-especialista" type="text" [(ngModel)]="busquedaEspecialista" placeholder="Buscar por especialista"/>
+    </div>    
   </div>
 
   <!-- Listado de turnos -->
@@ -43,7 +27,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of turnos">
+      <tr *ngFor="let t of turnos | filtroEpecialidad: busquedaEspecialidad | filtroEpecialista: busquedaEspecialista">
         <td>{{ t.fecha | date: 'shortDate' }}</td>
         <td>{{ t.fecha | date: 'shortTime' }}</td>
         <td>{{ t.especialidad }}</td>
