@@ -1,10 +1,10 @@
 <div *ngIf="!tipoSeleccionado" class="selector-container">
   <button type="button" class="tipo-btn" (click)="seleccionarTipo('paciente')">
-    <img src="assets/paciente.png" alt="Paciente" />
+    <img src="assets/paciente.png" alt="Paciente" [@tipoSeleccionado]="animacionTipo  === 'izquierda' ? 'izquierda' : 'visible'"/>
     <span>Paciente</span>
   </button>
   <button type="button" class="tipo-btn" (click)="seleccionarTipo('especialista')">
-    <img src="assets/especialista.png" alt="Especialista" />
+    <img src="assets/especialista.png" alt="Especialista" [@tipoSeleccionado]="animacionTipo  === 'derecha' ? 'derecha' : 'visible'"/>
     <span>Especialista</span>
   </button>
 </div>
