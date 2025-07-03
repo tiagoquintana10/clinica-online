@@ -6,7 +6,7 @@ export interface Turno {
   especialidad: string;
   fecha: string; 
   estado: string;
-  resena?: string;
+  reseña?: string;
   historia_clinica: boolean;
   calificacion?: string;
 }
