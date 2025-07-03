@@ -4,45 +4,41 @@
     <button (click)="descargarExcelUsuarios()">Descargar Usuarios</button>
   </div>
 
-  <table *ngIf="usuarios.length > 0">
-    <thead>
-      <tr>
-        <th>Nombre Completo</th>
-        <th>Edad</th>
-        <th>DNI</th>
-        <th>Email</th>
-        <th>Categoría</th>
-        <th>Habilitado</th>
-        <th>Historia clinica</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let usuario of usuarios">
-        <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
-        <td>{{ usuario.edad }}</td>
-        <td>{{ usuario.dni }}</td>
-        <td>{{ usuario.email }}</td>
-        <td>{{ usuario.categoria }}</td>
-        <td>
-          <button *ngIf="usuario.categoria === 'especialista' || usuario.categoria === 'administrador'" 
+  <div *ngIf="usuarios.length > 0" class="cards-list">
+
+    <div *ngFor="let usuario of usuarios; let i = index">
+      <h3 *ngIf="i === 0 && usuario.categoria === 'paciente'" class="categoria-titulo">Pacientes</h3>
+      <h3 *ngIf="i > 0 && usuarios[i - 1].categoria !== usuario.categoria && usuario.categoria === 'especialista'" class="categoria-titulo">Especialistas</h3>
+      <h3 *ngIf="i > 0 && usuarios[i - 1].categoria !== usuario.categoria && usuario.categoria === 'administrador'" class="categoria-titulo">Administradores</h3>
+    
+      <div class="usuario-card" [categoria]="usuario.categoria">
+        <div class="usuario-info">
+          <div><strong>Nombre:</strong> {{ usuario.nombre }} {{ usuario.apellido }}</div>
+          <div><strong>Edad:</strong> {{ usuario.edad }}</div>
+          <div><strong>DNI:</strong> {{ usuario.dni }}</div>
+          <div><strong>Email:</strong> {{ usuario.email }}</div>
+        </div>
+        
+        <div>
+          <img [src]="getAvatarUrl(usuario.url_img1)" alt="Usuario" (click)="descargarExcelTurnos(usuario)" zoom/>
+        </div>
+
+        <div class="usuario-acciones">
+          <button *ngIf="usuario.categoria === 'especialista' || usuario.categoria === 'administrador'"
                   (click)="actualizarEstado(usuario)">
             {{ usuario.habilitado ? 'Deshabilitar' : 'Habilitar' }}
           </button>
-          <span *ngIf="usuario.categoria !== 'especialista' && usuario.categoria !== 'administrador'">
-            {{ usuario.habilitado ? 'Sí' : 'No' }}
-          </span>
-        </td>
-        <td>
+
           <button *ngIf="usuario.categoria === 'paciente'"
-            [routerLink]="['/home/usuarios/historias-clinicas']"
-            [queryParams]="{ pacienteId: usuario.id}"
-            >
-            Ver historia clinica
-            </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+                  [routerLink]="['/home/usuarios/historias-clinicas']"
+                  [queryParams]="{ pacienteId: usuario.id }">
+            Ver historia clínica
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <div *ngIf="usuarios.length === 0" class="no-users-message">
     No hay usuarios registrados para mostrar.
