@@ -4,6 +4,8 @@ ClinicaOnline es una aplicación web diseñada para facilitar la gestión y rese
 
 ## Navegación y uso de la aplicación
 
+![image](https://github.com/user-attachments/assets/aa7b93e9-d88c-461e-9193-e22a04aaf769)
+
 
 ## Development server
 
