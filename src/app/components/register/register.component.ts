@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment.prod';
 import { Usuario } from '../../models/usuario';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { trigger, transition, style, animate, query, animateChild, group, state, keyframes } from '@angular/animations';
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
@@ -14,7 +14,48 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   imports: [FormsModule,CommonModule,RouterModule],
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
+  animations:[
+    trigger('tipoSeleccionado', [
+      state('visible', style({
+        transform: 'scale(1)',
+        position: 'static',
+        width: '*',
+        height: '*',
+        opacity: 1,
+        zIndex: 1
+      })),
+      state('izquierda', style({
+        transform: 'scale(4)', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        objectFit: 'cover',
+        opacity: 0,
+        zIndex: 10
+      })),
+      state('derecha', style({
+        transform: 'scale(4)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        objectFit: 'cover',
+        opacity: 0,
+        zIndex: 10
+      })),
+      transition('visible => izquierda', [
+        animate('1200ms cubic-bezier(0.25, 0.1, 0.25, 1)')
+      ]),
+      transition('visible => derecha', [
+        animate('1200ms cubic-bezier(0.25, 0.1, 0.25, 1)')
+      ])
+    ])
+  
+  ]
 })
 export class RegisterComponent implements OnInit, AfterViewInit{
 
@@ -46,6 +87,8 @@ export class RegisterComponent implements OnInit, AfterViewInit{
   nuevaEspecialidad: string = '';
 
   tipoSeleccionado: boolean = false;
+  animacionTipo: 'visible' | 'izquierda' | 'derecha' = 'visible';
+  
 
   constructor(private router: Router) {}
 
@@ -254,8 +297,12 @@ export class RegisterComponent implements OnInit, AfterViewInit{
   }
 
   seleccionarTipo(tipo: 'paciente' | 'especialista') {
-    this.tipoSeleccionado = true;
     this.usuario.categoria = tipo;
+    this.animacionTipo = tipo === 'paciente' ? 'izquierda' : 'derecha';
+
+    setTimeout(() => {
+      this.tipoSeleccionado = true;
+    }, 300);
   }
 
   obtenerNombreEspecialidad(id: string): string {
