@@ -25,6 +25,8 @@ export class HistoriasClinicasComponent implements OnInit{
   turnosIds: Record<number, Turno> ={};
   especialistasTurnosNombre: Record<string, string> = {};
 
+  resenasVisibles: { [id: string]: boolean } = {};
+
   constructor(private route:ActivatedRoute,private router:Router){}
 
   ngOnInit(): void {
@@ -81,7 +83,7 @@ export class HistoriasClinicasComponent implements OnInit{
         data.forEach(turno =>{
           this.turnosIds[turno.id] = turno;
         })
-        console.log('Data', data);
+        console.log('Turnos', data);
         this.turnosHistoriasClinicas = data;
 
         const idsEspecialistasTurno = data.map(t => t.especialista_id);
@@ -129,6 +131,11 @@ export class HistoriasClinicasComponent implements OnInit{
   objectKeys(obj: Record<string, string>): string[] {
     return Object.keys(obj);
   }
+
+  verResena(turno: any){
+    this.resenasVisibles[turno.id] = !this.resenasVisibles[turno.id];
+  }
+
 
 
 }
