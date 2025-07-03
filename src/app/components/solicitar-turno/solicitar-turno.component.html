@@ -60,7 +60,7 @@
   <button (click)="crearTurno()">Confirmar Turno</button>
 </div>
 
-
+<!-- solo para pacientes-->
 <div class="solicitar-turno-container" *ngIf="usuario && !esAdmin()">
   <h2>Solicitar Turno</h2>
 
@@ -76,9 +76,9 @@
 
   <div class="especialidades-lista" *ngIf="turno.especialista_id && !turno.especialidad && especialidadesPorEspecialista.length > 0">
     <h3>Seleccione una Especialidad</h3>
-    <div class="especialidad-card" *ngFor="let esp of especialidadesPorEspecialista" (click)="onEspecialidadChange(esp)">
-      <img [src]="'assets/default.png'" alt="Especialidad" />
-      <p>{{ esp }}</p>
+    <div class="especialidad-card" *ngFor="let esp of especialidadesPorEspecialista" (click)="onEspecialidadChange(esp.nombre)">
+      <img [src]="esp.url_img1 ? getAvatarUrl(esp.url_img1) : 'assets/default.png'" alt="Especialidad" />
+      <p>{{ esp.nombre }}</p>
     </div>
   </div>
 
@@ -102,7 +102,7 @@
         class="hora-card"
         [class.selected]="horaSeleccionada === hora"
         (click)="onHoraSeleccionadaChange(hora)">
-        {{ hora }}
+        {{ formatoHoraAMPM(hora) }}
       </button>
     </div>
   </div>
