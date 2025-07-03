@@ -119,4 +119,8 @@ export class PacientesComponent implements OnInit{
       
   }
 
+  getAvatarUrl(avatarUrl: string) {
+    return supabase.storage.from('images').getPublicUrl(avatarUrl).data.publicUrl;
+  }
+
 }
