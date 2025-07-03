@@ -5,7 +5,7 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
 import { Usuario } from '../../models/usuario';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
-
+import { trigger, transition, style, animate, query, animateChild, group, state, keyframes } from '@angular/animations';
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
@@ -13,8 +13,37 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   selector: 'app-home',
   imports: [RouterOutlet, CommonModule,RouterLink],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+  animations:[
+    trigger('routeAnimations', [
+      transition('* <=> *', [
+        style({ position: 'relative' }),
+        query(':enter, :leave', [
+          style({
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%'
+          })
+        ], { optional: true }),
+        query(':enter', [
+          style({ top: '100%', opacity: 0 })
+        ], { optional: true }),
+        query(':leave', animateChild(), { optional: true }),
+        group([
+          query(':leave', [
+            animate('3000ms ease-out', style({ top: '100%', opacity: 0 }))
+          ], { optional: true }),
+          query(':enter', [
+            animate('1500ms ease-out', style({ top: '0%', opacity: 1 }))
+          ], { optional: true })
+        ]),
+        query(':enter', animateChild(), { optional: true }),
+      ])
+    ])
+  ]
 })
+
 export class HomeComponent implements OnInit{
 
   rutaActual: string = '';
@@ -32,6 +61,10 @@ export class HomeComponent implements OnInit{
     });
   
     this.getUserData();
+  }
+
+  prepareRoute(outlet: RouterOutlet) {
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
 
