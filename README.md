@@ -1,5 +1,9 @@
 # ClinicaOnline
 
+ClinicaOnline es una aplicación web diseñada para facilitar la gestión y reserva de turnos médicos en una clínica. Permite a los pacientes seleccionar especialistas, especialidades, fechas y horarios disponibles de forma sencilla, mientras que los administradores pueden gestionar pacientes, especialistas y turnos desde un panel intuitivo. La plataforma optimiza la organización de citas, mejorando la experiencia tanto del personal médico como de los pacientes.
+
+## Navegación y uso de la aplicación
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.6.
 
 ## Development server
