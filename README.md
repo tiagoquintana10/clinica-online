@@ -4,6 +4,10 @@ ClinicaOnline es una aplicación web diseñada para facilitar la gestión y rese
 
 ## Navegación y uso de la aplicación
 
+![image](https://github.com/user-attachments/assets/82ab17b4-9d9f-4fda-bce0-0d9f8c96dacc)
+La app comienza aqui, si ya tienes un usuario puedes iniciar sesion, sino deberas crear uno antes
+
+
 ![image](https://github.com/user-attachments/assets/aa7b93e9-d88c-461e-9193-e22a04aaf769)
 
 
