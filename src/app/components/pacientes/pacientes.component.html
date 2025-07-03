@@ -2,17 +2,24 @@
   <h2>Pacientes Atendidos</h2>
 
   <div class="paciente-item" *ngFor="let paciente of PacientesAtendidos">
-    <div class="info">
-      <div class="nombre">{{ paciente.nombre }} {{ paciente.apellido }}</div>
-      <div class="dni">DNI: {{ paciente.dni }}</div>
-      <div class="obra-social">Obra Social: {{ paciente.obra_social || 'Sin especificar' }}</div>
-    </div>
-    <button 
-        [routerLink]="['/home/pacientes/historias-clinicas']"
-        [queryParams]="{ pacienteId: paciente.id}"
+    <!-- Imagen dentro del fav-button redondo -->
+    <button class="fav-button" 
+      [routerLink]="['/home/pacientes/historias-clinicas']"
+      [queryParams]="{ pacienteId: paciente.id }"  
     >
-    Ver historia clinica</button>
+      <img 
+        [src]="getAvatarUrl(paciente.url_img1)" 
+        alt="{{ paciente.nombre }}" 
+      />
+    </button>
+
+    <div class="info">
+      <div class="nombre">
+        {{ paciente.nombre }} {{ paciente.apellido }}
+      </div>
+    </div>
   </div>
+
 
 
   <div *ngIf="PacientesAtendidos.length === 0" class="no-pacientes">
