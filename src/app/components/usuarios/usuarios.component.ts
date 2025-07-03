@@ -7,12 +7,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import {saveAs} from 'file-saver';
+import { CategoriaDirective } from '../../directivas/Categoria.directive';
+import { ZoomDirective } from '../../directivas/zoom.directive';
+
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule,FormsModule,RouterLink],
+  imports: [CommonModule,FormsModule,RouterLink,CategoriaDirective,ZoomDirective],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.scss'
 })
@@ -22,9 +25,13 @@ export class UsuariosComponent implements OnInit{
 
   ngOnInit() {
     this.getUsersData();
+    this.loadEspecialidades();
   }
 
   usuarios: Usuario [] = [];
+  especialidades: { [id: string]: string } = {};
+  turnoRealizadosPaciente: any[] = [];
+
 
   //trae todos los usuarios a excepcion del logueado
   getUsersData(){
@@ -41,10 +48,48 @@ export class UsuariosComponent implements OnInit{
           return;
         }  
         console.log('Usuarios:', data);
-        this.usuarios = data;  
+        if(data && data.length > 0 ){
+          for (var i = 0; i < data.length - 1; i++) {
+            for (var j = 0; j < data.length - 1 - i; j++) {
+              if (this.categoriaOrden(data[j].categoria) > this.categoriaOrden(data[j + 1].categoria)) {
+                var temp = data[j];
+                data[j] = data[j + 1];
+                data[j + 1] = temp;
+              }
+            }
+          }
+          this.usuarios = data;
+        }  
       });
     });
   }
+
+  categoriaOrden(categoria: string): number {
+    if (categoria === 'paciente') return 0;
+    if (categoria === 'especialista') return 1;
+    if (categoria === 'administrador') return 2;
+    return 3; // Para cualquier otro caso
+  }
+
+  loadEspecialidades() {
+    supabase
+      .from('especialidades')
+      .select('id, nombre')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error al cargar especialidades:', error.message);
+          return;
+        }
+
+        if (data) {
+          for (let i = 0; i < data.length; i++) {
+            const esp = data[i];
+            this.especialidades[esp.id] = esp.nombre;
+          }
+        }
+      });
+  }
+
 
   actualizarEstado(usuario: Usuario) {
     const nuevoEstado = !usuario.habilitado;
@@ -68,7 +113,13 @@ export class UsuariosComponent implements OnInit{
       Apellido: usuario.apellido,
       Email: usuario.email,
       DNI: usuario.dni,
-      "Tipo de Usuario": usuario.categoria
+      "Obra social": usuario.obra_social,
+      "Tipo de Usuario": usuario.categoria,
+      Especialidades: (usuario.categoria === 'especialista' && usuario.especialidades && usuario.especialidades.length)
+        ? usuario.especialidades.map(id => this.especialidades[id] || id)
+            .join(', ')
+        : '',
+      
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(datosParaExcel);
@@ -78,6 +129,71 @@ export class UsuariosComponent implements OnInit{
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, 'usuarios.xlsx');
+  }
+
+  descargarExcelTurnos(usuario:Usuario){
+      
+    if(!usuario || usuario.categoria !== 'paciente'){
+      return;
+    }
+
+    supabase
+      .from('turnos')
+      .select('fecha, especialidad, especialista_id')
+      .eq('paciente_id',usuario.id)
+      .eq('estado','realizado')
+      .then(({data, error}) => {
+        if(error){
+          console.error('Error al cargar turnos del paciente', error.message);
+          return;
+        }
+
+        if(!data || !data.length){
+          console.warn('Este paciente no tiene turnos realizados');
+          return;
+        }
+
+        const especialistasIds = data.map(t => t.especialista_id);
+        
+        supabase
+          .from('usuarios')
+          .select('id, nombre, apellido')
+          .in('id', especialistasIds)
+          .then(({ data: especialistas, error: errorUsuarios }) => {
+            if (errorUsuarios) {
+              return;
+            }
+
+            const nombreEspecialistas = data.map(t =>
+              (especialistas.find(e => e.id === t.especialista_id) || { nombre: '', apellido: '' })
+            ).map(e => `${e.nombre} ${e.apellido}`.trim());
+
+            const datosParaExcel = data.map((turno,i) => {
+              const fechaObj = new Date(turno.fecha);
+              return {
+                Fecha: fechaObj.toLocaleDateString(),
+                Hora: fechaObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                Especialidad: turno.especialidad,
+                Especialista:  nombreEspecialistas[i] || 'Desconocido'
+                
+              };
+            });  
+            
+            const worksheet = XLSX.utils.json_to_sheet(datosParaExcel);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Turnos');
+
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+            saveAs(blob, `turnos_${usuario.nombre}_${usuario.apellido}.xlsx`); 
+        
+        });
+      
+      });
+  }
+
+  getAvatarUrl(avatarUrl: string) {
+    return supabase.storage.from('images').getPublicUrl(avatarUrl).data.publicUrl;
   }
 
 }
