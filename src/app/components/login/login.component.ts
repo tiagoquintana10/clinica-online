@@ -54,6 +54,7 @@ export class LoginComponent implements OnInit{
         }
         console.error('Error:', error.message)
       }else{
+        const userId = data.user.id;
 
         supabase
         .from('usuarios')
@@ -73,8 +74,23 @@ export class LoginComponent implements OnInit{
             return;
           }
 
-          this.router.navigate(['home']);
-        })
+          supabase
+            .from('logs-usuarios')
+            .insert([
+              {
+                usuario_id: userId,
+                fecha_hora: new Date().toISOString()
+              }
+            ]).then(({data,error}) =>{
+              if(error){
+                console.error('Error al registrar log del usuario', error.message);
+              }else{
+                console.log('Log de usuario registrado');
+              }
+
+              this.router.navigate(['home']);
+            });
+        });
       }
     });
   }
