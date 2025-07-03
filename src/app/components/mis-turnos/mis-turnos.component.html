@@ -1,21 +1,60 @@
 <div class="mis-turnos-container">
   <h2>Mis Turnos</h2>
 
+  <!-- Filtros -->
+  <div class="filtros">
+    <div class="filtros-arriba">
+      <div class="filtro-item">  
+        <label for="filtro-especialidad">Especialidad:</label>
+        <input id="filtro-especialidad" type="text" [(ngModel)]="busquedaEspecialidad" placeholder="Especialidad"/>
+      </div>
+      <div *ngIf="usuario?.categoria === 'paciente'" class="filtro-item">
+        <label for="filtro-especialista">Especialista:</label>
+        <input id="filtro-especialista" type="text" [(ngModel)]="busquedaEspecialistaPaciente" placeholder="Especialista"/>
+      </div>
+      <div *ngIf="usuario?.categoria === 'especialista'" class="filtro-item">
+        <label for="filtro-paciente">Paciente:</label>
+        <input id="filtro-paciente" type="text" [(ngModel)]="busquedaEspecialistaPaciente" placeholder="Paciente"/>
+      </div>
+      <div class="filtro-item">  
+        <label for="filtro-estado">Estado:</label>
+        <input id="filtro-estado" type="text" [(ngModel)]="busquedaEstado" placeholder="Estado"/>
+      </div>
+      <div class="filtro-item">  
+        <label for="filtro-fecha">Fecha:</label>
+        <input id="filtro-fecha" type="text" [(ngModel)]="busquedafecha" placeholder="Fecha"/>
+      </div>
+      <div class="filtro-item">  
+        <label for="filtro-hora">Hora:</label>
+        <input id="filtro-hora" type="text" [(ngModel)]="busquedahora" placeholder="Horario"/>
+      </div>
+    </div>
+    <div class="filtro-historiaClinica-container">
+      <div class="filtro-item">  
+        <label for="filtro-historiaClinica">Filtrar por cualquier dato de la historia clinica:</label>
+        <input id="filtro-historiaClinica" type="text" [(ngModel)]="busquedaHistoriaClinica" placeholder="valor"/>     
+      </div> 
+    </div>     
+  </div>
+
+
   <table>
     <thead>
       <tr>
         <th>Fecha</th>
         <th>Hora</th>
         <th>Especialidad</th>
-        <th>Nombre</th>
+        <th *ngIf="usuario?.categoria === 'paciente'">Especialista</th>
+        <th *ngIf="usuario?.categoria === 'especialista'">Paciente</th>
         <th>Estado</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of turnos">
+      <tr *ngFor="let t of turnos | filtroEpecialidad: busquedaEspecialidad | filtroEpecialistaPaciente: busquedaEspecialistaPaciente : usuario?.categoria | estado: busquedaEstado
+        | fecha: busquedafecha | hora: busquedahora | historiaClinica: busquedaHistoriaClinica">
         <td>{{ t.fecha | date: 'shortDate' }}</td>
-        <td>{{ t.fecha | date: 'shortTime' }}</td>
+        <td>{{ t.fecha | date: 'shortTime' }}</td>  
         <td>{{ t.especialidad }}</td>
         <td>
           <ng-container *ngIf="usuario?.categoria === 'paciente'">
