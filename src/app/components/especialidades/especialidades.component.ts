@@ -4,12 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HabilitadoDirective } from '../../directivas/Habilitado.directive';
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
   selector: 'app-especialidades',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,HabilitadoDirective],
   templateUrl: './especialidades.component.html',
   styleUrl: './especialidades.component.scss'
 })
