@@ -17,6 +17,7 @@ import { AgregarEspecialidadComponent } from './components/agregar-especialidad/
 import { PacientesComponent } from './components/pacientes/pacientes.component';
 import { HistoriasClinicasComponent } from './components/historias-clinicas/historias-clinicas.component';
 import { CargarHistoriaClinicaComponent } from './components/cargar-historia-clinica/cargar-historia-clinica.component';
+import { InformesComponent } from './components/informes/informes.component';
 
 export const routes: Routes = [
 
@@ -35,51 +36,69 @@ export const routes: Routes = [
         children:[
             {   path: 'usuarios',
                 component: UsuariosComponent,
+                data: { animation: 'usuarios' },
             },
             {   path: 'usuarios/historias-clinicas',
                 component: HistoriasClinicasComponent,
+                data: { animation: 'historia-clinica' },
             },
             {   path: 'especialidades',
                 component: EspecialidadesComponent,
+                data: { animation: 'especialidades' },
             },
             {
                 path: 'generar-usuario',
                 component: GenerarUsuarioComponent,
+                data: { animation: 'generar-usuario' },
             },
             {
                 path: 'perfil',
                 component: PerfilComponent,
+                data: { animation: 'perfil' },
             },                
             {
                 path: 'perfil/disponibilidad',
-                component: DisponibilidadComponent
+                component: DisponibilidadComponent,
+                data: { animation: 'disponibilidad' },
             },
             {   path: 'perfil/agregar-especialidad',
                 component: AgregarEspecialidadComponent,
+                data: { animation: 'agregarEsp' },
             }, 
             {
                 path: 'solicitar-turno',
                 component: SolicitarTurnoComponent,
+                data: { animation: 'solicitar-turno' },
             },
             {
                 path: 'turnos',
                 component: TurnosComponent,
+                data: { animation: 'turnos' },
             },
             {
                 path: 'mis-turnos',
                 component: MisTurnosComponent,
+                data: { animation: 'mis-turnos' },
             },
             {
                 path: 'mis-turnos/cargar-historia-clinica',
                 component: CargarHistoriaClinicaComponent,
+                data: { animation: 'cargar-historia-clinica' },
             },
             {
                 path: 'pacientes',
                 component: PacientesComponent,
+                data: { animation: 'pacientes' },
             },
             {
                 path: 'pacientes/historias-clinicas',
                 component: HistoriasClinicasComponent,
+                data: { animation: 'historia-clinica' },
+            },
+            {
+                path: 'informes',
+                component: InformesComponent,
+                data: { animation: 'informes' },
             },
         ]
     },
