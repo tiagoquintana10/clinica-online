@@ -46,6 +46,22 @@
       >
         Ver historia clinica            
       </button>
+      <button (click)="abrirSelectorDescarga()">Descargar historia clinica</button>
+    </div>
+
+    <div *ngIf="mostrarSelectorDescarga" class="modal-backdrop">
+      <div class="modal-dialog">
+        <h3>¿Qué historia clínica querés descargar?</h3>
+        <select [(ngModel)]="especialistaSeleccionado">
+          <option value="todos">Toda la historia clínica</option>
+          <option *ngFor="let id of getEspecialistaIds()" [value]="id">
+            {{ especialistasAtendieronPaciente[id].nombre }} {{ especialistasAtendieronPaciente[id].apellido }}
+          </option>
+        </select>
+        <br><br>
+        <button (click)="confirmarDescarga()">Descargar</button>
+        <button (click)="cerrarSelectorDescarga()">Cancelar</button>
+      </div>
     </div>
 
   </div>
