@@ -6,14 +6,22 @@ import { createClient } from '@supabase/supabase-js';
 import { Usuario } from '../../models/usuario';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MockLocationStrategy } from '@angular/common/testing';
+import { FiltroEspecialidadPipe } from '../../pipes/filtroEspecialidad.pipe';
+import { FechaPipe } from '../../pipes/fecha.pipe';
+import { HoraPipe } from '../../pipes/hora.pipe';
+import { EstadoPipe } from '../../pipes/estado.pipe';
+import { FiltroEspecialistaPacientePipe } from '../../pipes/filtroespecialistaPaciente.pipe';
+import { HistoriaClinicaPipe } from '../../pipes/historiaClinica.pipe';
+
+
+
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
   selector: 'app-mis-turnos',
   standalone: true,
-  imports: [CommonModule,FormsModule,RouterLink],
+  imports: [CommonModule,FormsModule,RouterLink,FiltroEspecialidadPipe,FiltroEspecialistaPacientePipe,FechaPipe,HoraPipe,EstadoPipe,HistoriaClinicaPipe],
   templateUrl: './mis-turnos.component.html',
   styleUrl: './mis-turnos.component.scss'
 })
@@ -29,6 +37,13 @@ export class MisTurnosComponent implements OnInit {
   encuestaVisible: { [id: string]: boolean } = {};
   calificacionVisible: { [id: string]: boolean } = {};  
   msgError:{ [key: string] : string } = {};
+
+  busquedaEspecialistaPaciente: string = '';
+  busquedaEspecialidad: string = '';
+  busquedaEstado: string = '';
+  busquedafecha: string = '';
+  busquedahora: string = '';
+  busquedaHistoriaClinica: string = '';
 
   constructor(private router : Router){}
 
@@ -76,11 +91,43 @@ export class MisTurnosComponent implements OnInit {
           this.turnos = [];
           return;
         }
-        this.turnos = (data as any[]).map(t => ({
+        const turnosSinHistoria = (data as any[]).map(t => ({
           ...t,
           paciente: t.paciente || { nombre: 'Paciente', apellido: '' },
           especialista: t.especialista || { nombre: 'Especialista', apellido: '' },
+          paciente_nombre: t.paciente ? `${t.paciente.nombre} ${t.paciente.apellido}` : 'Paciente',
+          especialista_nombre: t.especialista ? `${t.especialista.nombre} ${t.especialista.apellido}` : 'Especialista',
+          historiaClinica: null
         }));
+
+        const turnosIds = turnosSinHistoria.map(t => t.id);
+
+        supabase
+          .from('historias-clinicas')
+          .select('*')
+          .in('turno_id',turnosIds)
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('Error cargando historias clínicas:', error.message);
+              this.turnos = turnosSinHistoria;
+            }
+
+            this.turnos = turnosSinHistoria.map(t => {
+              const historia = data?.find(h => h.turno_id === t.id);
+              return {
+                ...t,
+                historiaClinica: historia?{
+                  altura: historia.altura,
+                  peso: historia.peso,
+                  temperatura: historia.temperatura,
+                  presion: historia.presion,
+                  datos_dinamicos: historia.datos_dinamicos || {}
+                } : null
+              
+                
+              };
+            });
+          });
       });
   }
 
