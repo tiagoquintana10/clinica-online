@@ -14,23 +14,51 @@
 
   .filtros {
     display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    margin-bottom: 30px;
 
-    label {
-      font-weight: bold;
+    .filtros-arriba {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      flex: 1 1 auto;
     }
 
-    input {
-      flex: 1;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    
+    .filtro-historiaClinica-container {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start; 
+      margin-top: 10px; 
+    }
 
-      &:focus {
-        outline: none;
-        border-color: #3498db;
+    .filtro-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 20px;
+
+      label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #2c3e50;
+      }
+
+      input[type="text"] {
+        width: 40%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 12px;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+          border-color: #3498db;
+          outline: none;
+        }
       }
     }
   }
